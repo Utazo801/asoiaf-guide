@@ -21,6 +21,7 @@ import { BookPageComponent } from './components/book-page/book-page.component';
 import { HousePageComponent } from './components/house-page/house-page.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { UserInputComponent } from './components/user-input/user-input.component';
+import { CharacterDetailsComponent } from './components/character-details/character-details.component';
 
 //Angular Material
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -30,6 +31,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatListModule } from '@angular/material/list';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -42,6 +45,8 @@ import { MatSelectModule } from '@angular/material/select';
     FormsModule,
     MatButtonModule,
     MatSelectModule,
+    MatListModule,
+    MatCardModule
   ],
   declarations: [
     AppComponent,
@@ -51,6 +56,7 @@ import { MatSelectModule } from '@angular/material/select';
     HousePageComponent,
     NavbarComponent,
     UserInputComponent,
+    CharacterDetailsComponent
   ],
   providers: [
     CharacterService,

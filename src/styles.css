@@ -13,3 +13,9 @@ body {
   margin: 0;
   font-family: "Rosarivo";
 }
+
+a{
+  text-decoration: none;
+  color: black;
+  font-family: "Rosarivo";
+}

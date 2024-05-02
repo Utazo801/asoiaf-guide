@@ -62,9 +62,6 @@ export class CharacterService {
     return this.fetchCharactersFromApi(options).pipe(
       map((data) => {
         const totalResults = data.length;
-        console.log(page);
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, totalResults);
         const results = data;
 
         return <SearchResult<Character>>{
@@ -142,14 +139,18 @@ export class CharacterService {
     this.getCharacters();
   }
 
-  getCharacterByID(id: number): Character | null {
+  getCharacterByID(id: number): Observable<Character | null> {
     const cachedData = localStorage.getItem(this.storageKey);
     if (cachedData) {
       const tempChars: Character[] = JSON.parse(cachedData);
       const foundCharacter = tempChars.find((t) => t.id === id);
-      return foundCharacter || null;
+      if (foundCharacter) {
+        return of(foundCharacter);
+      } else {
+        return this.fetchFromAPIByID(id);
+      }
     }
-    return null;
+    return of(null);
   }
   private saveArray(characters: Character[]) {
     // Get existing data from localStorage
