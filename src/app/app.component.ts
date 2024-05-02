@@ -25,17 +25,5 @@ export class AppComponent {
     private bookService: BookService
   ) {}
 
-  ngOnInit() {
-    this.characterService.loadCharacters().subscribe((data) => {
-      this.characters = data;
-    });
-
-    this.houseService.loadHouses().subscribe((data) => {
-      this.houses = data;
-    });
-
-    this.bookService.loadBooks().subscribe((data) => {
-      this.books = data;
-    });
-  }
+  ngOnInit() {}
 }

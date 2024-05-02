@@ -1,1 +1,11 @@
-<p>character-page works!</p>
+<a *ngFor="let character of (characters| async)?.results" [class.active]="character === selectedCharacter" (click)="selectedCharacter = character">
+    <h6 class="text-info">{{character.name || character.aliases}}</h6>
+
+</a>
+
+<div class="paging">
+    <!-- <button mat-flat-button (click)="currentPage = 1;getCharacters()" [disabled]="currentPage === 1">First</button> -->
+    <button mat-flat-button (click)="previousPage()" [disabled]="currentPage === 1">Previous Page</button>
+    <button mat-flat-button (click)="nextPage()">Next Page</button>
+    <!-- <button mat-flat-button (click)="currentPage=maxPages;" [disabled]="currentPage === maxPages">Last</button> -->
+</div>

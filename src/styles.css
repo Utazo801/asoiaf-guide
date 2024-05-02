@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Rosarivo:ital@0;1&display=swap");
+@font-face {
+  font-family: "got";
+  src: url("assets/fonts/Game\ of\ Thrones.ttf") format("truetype");
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: "Rosarivo";
+}

@@ -8,10 +8,11 @@ export interface Character {
   died: string;
   titles: string[];
   aliases: string[];
-  father: Character; //url
-  mother: Character; //url
-  spouse: Character; //url
+  father: string; //url
+  mother: string; //url
+  spouse: string; //url
   allegiances: string[]; //urls
+  houseids: number[];
   books: string[]; //urls
   povBooks: string[]; //url
   tvSeries: string[];
