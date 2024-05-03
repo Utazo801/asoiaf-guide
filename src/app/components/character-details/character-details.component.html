@@ -1,13 +1,27 @@
 <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ character!.name }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>ID: {{ character!.id }}</p>
-      <p>Gender: {{ character!.gender }}</p>
-      <p>Culture: {{ character!.culture }}</p>
-      <p>Born: {{ character!.born }}</p>
-      <!-- Add more details as needed -->
-    </mat-card-content>
+  <mat-card-header>
+    <mat-card-title>{{ character.name || character.aliases[0] }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>ID: {{ character.id }}</p>
 
-  </mat-card>
+    <p>Gender: {{ character.gender }}</p>
+    <p>Culture: {{ character.culture }}</p>
+    <p>Born: {{ character.born }}</p>
+    <p>Died: {{ character.died }}</p>
+    <div>
+      <p>Aliases: </p>
+      <mat-list role="list">
+        <mat-list-item role="listitem" *ngFor="let alias of character.aliases">{{alias}}</mat-list-item>
+
+      </mat-list>
+
+    </div>
+    <div>
+      <p>Allegiances: </p>
+      <span *ngFor="let house of character.houseids">{{house}}</span>
+    </div>
+    <!-- Add more details as needed -->
+  </mat-card-content>
+
+</mat-card>

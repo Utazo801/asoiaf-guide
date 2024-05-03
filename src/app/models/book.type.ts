@@ -11,6 +11,8 @@ export interface Book {
   country: string;
   mediaType: string;
   released: string;
-  charachters: string[];
+  characters: string[];
+  characterids: number[];
   povCharacters: string[];
+  povCharactersids: number[];
 }

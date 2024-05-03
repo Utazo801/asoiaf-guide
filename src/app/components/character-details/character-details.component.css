@@ -1,0 +1,10 @@
+body {
+  font-family: "Rosarivo";
+}
+mat-card-title {
+  font-family: "Rosarivo";
+  font-weight: bold;
+}
+mat-list mat-list-item {
+  font-family: "Rosarivo";
+}

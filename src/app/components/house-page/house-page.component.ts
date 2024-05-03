@@ -24,32 +24,32 @@ export class HousePageComponent {
   nextPage(): void {
     if (this.currentPage < this.pageSize) {
       this.currentPage++;
-      this.getCharacters();
+      this.getHouses();
     }
   }
 
   prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.getCharacters();
+      this.getHouses();
     }
   }
 
   ngOnInit(): void {
-    this.getCharacters();
+    this.getHouses();
   }
 
-  getCharacters() {
-    this.characters = this.houseService.getHouses({
+  getHouses() {
+    this.houses = this.houseService.getHouses({
       page: this.currentPage,
       searchTerm: this.searchTerm,
     });
-    this.characters.subscribe((r) => {
+    this.houses.subscribe((r) => {
       this.maxPages = Math.ceil(r.allResults / this.pageSize);
       this.currentPage = r.page;
     });
   }
 
   selectedHouse!: House;
-  characters!: Observable<SearchResult<House>>;
+  houses!: Observable<SearchResult<House>>;
 }

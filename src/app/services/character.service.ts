@@ -1,7 +1,17 @@
 import { Character } from '../models/character.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, catchError, map, merge, of, tap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  catchError,
+  concatMap,
+  forkJoin,
+  map,
+  merge,
+  of,
+  tap,
+} from 'rxjs';
 import * as _ from 'lodash';
 import { SearchResult } from '../models/search-result.type';
 
@@ -27,9 +37,9 @@ export class CharacterService {
     died?: string;
     isAlive?: boolean;
   }): Observable<SearchResult<Character>> {
-    const pageSize = options?.pageSize || 10;
-    const page = options?.page || 1;
-    const searchTerm = options?.name || '';
+    const pageSize = options?.pageSize ? options.pageSize : 10;
+    const page = options?.page ? options.page : 1;
+    const searchTerm = options?.name ? options.name : '';
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     // Check if characters are available in local storage
@@ -75,6 +85,53 @@ export class CharacterService {
     );
   }
 
+  // getAllCharacters(): Observable<Character[]> {
+  //   // Make the initial API call to get the first page of characters
+  //   let page = 1;
+  //   let pageSize = 50;
+  //   let queryparams = new HttpParams()
+  //     .append('page', page.toString())
+  //     .append('pageSize', pageSize.toString());
+  //   return this.http.get<Character[]>(
+  //     `${this.apiUrl}?page=${page}&pageSize=${pageSize}`
+  //   );
+  //   // .pipe(
+  //   //   concatMap((response) => {
+  //   //     let characters = response; // Store the characters from the first page
+  //   //     let pages = 43; // Calculate the number of pages
+  //   //     const requests: Observable<Character[]>[] = []; // Array to store requests for subsequent pages
+  //   //     // Loop through pages starting from the second page
+  //   //     for (let i = 2; i <= pages; i++) {
+  //   //       console.log(i);
+  //   //       // Push requests for subsequent pages into the requests array
+  //   //       requests.push(
+  //   //         this.http
+  //   //           .get<Character[]>(`${this.apiUrl}?pageSize=50&page=${i}`)
+  //   //           .pipe(
+  //   //             tap((char) => {
+  //   //               characters = characters.concat(char);
+  //   //             })
+  //   //           )
+  //   //       );
+  //   //     }
+  //   //     // If there are more than one page, make another request for the last page
+  //   //     return requests.length > 0
+  //   //       ? forkJoin(requests).pipe(
+  //   //           map((responses: Character[][]) => {
+  //   //             // Concatenate characters from all the pages
+  //   //             characters = responses.reduce(
+  //   //               (acc: Character[], val: Character[]) => acc.concat(val),
+  //   //               characters
+  //   //             );
+  //   //             this.saveArray(characters);
+  //   //             return characters;
+  //   //           })
+  //   //         )
+  //   //       : of(characters); // If there is only one page, return characters from the first page
+  //   //   })
+  //   // );
+  // }
+
   private fetchCharactersFromApi(options?: {
     page?: number;
     pageSize?: number;
@@ -110,6 +167,11 @@ export class CharacterService {
           characters.forEach((character) => {
             const urlParts = character.url.split('/');
             character.id = parseInt(urlParts[urlParts.length - 1]);
+            character.allegiances.forEach((a) => {
+              const urlParts = a.split('/');
+              character.houseids = [];
+              character.houseids.push(parseInt(urlParts[urlParts.length - 1]));
+            });
           });
           this.saveArray(characters);
         })
@@ -119,12 +181,16 @@ export class CharacterService {
   fetchFromAPIByID(id: number): Observable<Character | null> {
     return this.http.get<Character>(`${this.apiUrl}/${id}`).pipe(
       map((character) => {
+        character.allegiances.forEach((a) => {
+          const urlParts = a.split('/');
+          character.houseids.push(parseInt(urlParts[urlParts.length - 1]));
+        });
         this.saveSingle(character);
-        return character;
+        return character; // Return the character
       }),
       catchError((error) => {
         console.error('Error fetching character from API:', error);
-        return of(null); // Return null if the character is not found
+        return of(null); // Return Observable with null value in case of error
       })
     );
   }
@@ -147,10 +213,13 @@ export class CharacterService {
       if (foundCharacter) {
         return of(foundCharacter);
       } else {
+        // If character is not found in the cached data, fetch it from the API
         return this.fetchFromAPIByID(id);
       }
+    } else {
+      // If there's no cached data, fetch the character from the API
+      return this.fetchFromAPIByID(id);
     }
-    return of(null);
   }
   private saveArray(characters: Character[]) {
     // Get existing data from localStorage

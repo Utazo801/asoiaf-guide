@@ -1,0 +1,28 @@
+<div *ngIf="book" class="container">
+    <h2>{{ book.name }}</h2>
+    <mat-list>
+        <mat-list-item><strong>ISBN:</strong> {{ book.isbn }}</mat-list-item>
+        <mat-list-item *ngFor="let author of book.authors"><strong>Authors:</strong>
+            {{ book.authors.join(', ') }}
+        </mat-list-item>
+        <mat-list-item><strong>Number of Pages:</strong> {{ book.numberOfPages }}</mat-list-item>
+        <mat-list-item><strong>Publisher:</strong> {{ book.publisher }}</mat-list-item>
+        <mat-list-item><strong>Country:</strong> {{ book.country }}</mat-list-item>
+        <mat-list-item><strong>Media Type:</strong> {{ book.mediaType }}</mat-list-item>
+        <mat-list-item><strong>Released:</strong> {{ book.released }}</mat-list-item>
+        <mat-list-item><strong>Characters:</strong></mat-list-item>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizeCharacters" [length]="book.characterids.length" (page)="pageCharacters($event)">
+        </mat-paginator>
+        <mat-list-item *ngFor="let characterId of pagedCharacterIds">
+            {{ getCharacterName(characterId) +'\n' }}
+        </mat-list-item>
+
+        <mat-list-item><strong>POV Characters:</strong></mat-list-item>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizePOVCharacters" [length]="book.povCharactersids.length" (page)="pagePOVCharacters($event)">
+        </mat-paginator>
+        <mat-list-item *ngFor="let povCharacterId of pagedPOVCharacterIds">
+            {{ getCharacterName(povCharacterId)+'\n' }}
+        </mat-list-item>
+
+    </mat-list>
+</div>
