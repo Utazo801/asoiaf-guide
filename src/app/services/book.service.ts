@@ -93,26 +93,26 @@ export class BookService {
     return this.http.get<Book[]>(this.apiUrl, { params: queryparams }).pipe(
       tap((book) => {
         book.forEach((book) => {
-          const urlParts = book.url.split('/');
-          book.id = parseInt(urlParts[urlParts.length - 1]);
-          book.characterids = [];
-          book.povCharactersids = [];
-          book.characters.forEach((a) => {
-            const urlcharParts = a.split('/');
-            book.characterids.push(
-              parseInt(urlcharParts[urlcharParts.length - 1])
-            );
-          });
-          book.povCharacters.forEach((a) => {
-            const urlpovParts = a.split('/');
-            book.povCharactersids.push(
-              parseInt(urlpovParts[urlpovParts.length - 1])
-            );
-          });
+          this.BookProcessing(book);
         });
         this.saveArray(book);
       })
     );
+  }
+
+  private BookProcessing(book: Book) {
+    const urlParts = book.url.split('/');
+    book.id = parseInt(urlParts[urlParts.length - 1]);
+    book.characterids = [];
+    book.povCharactersids = [];
+    book.characters.forEach((a) => {
+      const urlcharParts = a.split('/');
+      book.characterids.push(parseInt(urlcharParts[urlcharParts.length - 1]));
+    });
+    book.povCharacters.forEach((a) => {
+      const urlpovParts = a.split('/');
+      book.povCharactersids.push(parseInt(urlpovParts[urlpovParts.length - 1]));
+    });
   }
 
   fetchFromAPIByID(id: number): Observable<Book | null> {
@@ -126,16 +126,6 @@ export class BookService {
         return of(null); // Return Observable with null value in case of error
       })
     );
-  }
-  saveSingle(book: Book) {
-    let tempBooks: Book[] = [];
-    const cachedData = localStorage.getItem(this.storageKey);
-    if (cachedData) {
-      tempBooks = JSON.parse(cachedData);
-    }
-    tempBooks.push(book);
-    localStorage.setItem(this.storageKey, JSON.stringify(tempBooks));
-    this.getBooks();
   }
 
   getBookByID(id: number): Observable<Book | null> {
@@ -152,6 +142,35 @@ export class BookService {
     } else {
       // If there's no cached data, fetch the character from the API
       return this.fetchFromAPIByID(id);
+    }
+  }
+
+  getBookName(id: number): Observable<string> {
+    // Look for character in cache
+    const existingData = localStorage.getItem(this.storageKey);
+    let cachedBooks: Character[] = [];
+    if (existingData) {
+      cachedBooks = JSON.parse(existingData);
+    }
+    let book = _.find(cachedBooks || [], (c) => c.id == id);
+
+    if (book && book.name) {
+      return of(book.name);
+    } else if (book && book.aliases && book.aliases.length > 0) {
+      return of(book.aliases[0]);
+    } else {
+      // If character is not found in cache, fetch it from the API
+      return this.getBookByID(id).pipe(
+        map((book) => {
+          if (book && book.name) {
+            return book.name;
+          } else if (book && book.authors && book.authors.length > 0) {
+            return book.authors[0];
+          } else {
+            return book!.id.toString();
+          }
+        })
+      );
     }
   }
   private saveArray(books: Book[]) {
@@ -173,8 +192,23 @@ export class BookService {
     });
 
     // Save updated data back to localStorage
-    this.books = cachedBooks;
+    this.books = cachedBooks.sort((a, b) => a.id - b.id);
     const characterData = JSON.stringify(cachedBooks);
     localStorage.setItem(this.storageKey, characterData);
+  }
+
+  saveSingle(book: Book) {
+    let tempBooks: Book[] = [];
+    const cachedData = localStorage.getItem(this.storageKey);
+    if (cachedData) {
+      tempBooks = JSON.parse(cachedData);
+      if (!tempBooks.some((c) => c.id === book.id)) {
+        tempBooks.push(book);
+      }
+    }
+    tempBooks = tempBooks.sort((a, b) => a.id - b.id);
+
+    localStorage.setItem(this.storageKey, JSON.stringify(tempBooks));
+    this.getBooks();
   }
 }

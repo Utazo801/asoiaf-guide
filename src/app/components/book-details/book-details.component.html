@@ -1,28 +1,69 @@
-<div *ngIf="book" class="container">
-    <h2>{{ book.name }}</h2>
-    <mat-list>
-        <mat-list-item><strong>ISBN:</strong> {{ book.isbn }}</mat-list-item>
-        <mat-list-item *ngFor="let author of book.authors"><strong>Authors:</strong>
-            {{ book.authors.join(', ') }}
-        </mat-list-item>
-        <mat-list-item><strong>Number of Pages:</strong> {{ book.numberOfPages }}</mat-list-item>
-        <mat-list-item><strong>Publisher:</strong> {{ book.publisher }}</mat-list-item>
-        <mat-list-item><strong>Country:</strong> {{ book.country }}</mat-list-item>
-        <mat-list-item><strong>Media Type:</strong> {{ book.mediaType }}</mat-list-item>
-        <mat-list-item><strong>Released:</strong> {{ book.released }}</mat-list-item>
-        <mat-list-item><strong>Characters:</strong></mat-list-item>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizeCharacters" [length]="book.characterids.length" (page)="pageCharacters($event)">
-        </mat-paginator>
-        <mat-list-item *ngFor="let characterId of pagedCharacterIds">
-            {{ getCharacterName(characterId) +'\n' }}
-        </mat-list-item>
+<div class="container">
+    <mat-card class="book-card">
+        <mat-card-header>
+            <mat-card-title>{{ book.name }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-card-actions>
+                <button mat-button color="primary" routerLink="/characters">Go Back</button>
+            </mat-card-actions>
+            <p>
+                <strong>ISBN:</strong> {{ book.isbn }}
+            </p>
+            <p>
+                <strong>Authors:</strong> {{ book.authors.join(', ') }}
+            </p>
+            <p>
+                <strong>Number of Pages:</strong> {{ book.numberOfPages }}
+            </p>
+            <p>
+                <strong>Publisher:</strong> {{ book.publisher }}
+            </p>
+            <p>
+                <strong>Country:</strong> {{ book.country }}
+            </p>
+            <p>
+                <strong>Media Type:</strong> {{ book.mediaType }}
+            </p>
+            <p>
+                <strong>Released:</strong> {{ book.released }}
+            </p>
 
-        <mat-list-item><strong>POV Characters:</strong></mat-list-item>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizePOVCharacters" [length]="book.povCharactersids.length" (page)="pagePOVCharacters($event)">
-        </mat-paginator>
-        <mat-list-item *ngFor="let povCharacterId of pagedPOVCharacterIds">
-            {{ getCharacterName(povCharacterId)+'\n' }}
-        </mat-list-item>
+            <div id="namedCharacters">
+                <strong>Characters:</strong>
+                <ng-container *ngIf="book.povCharactersids.length > 0; else noPOVCharacters">
+                    <mat-list>
+                        <mat-list-item *ngFor="let namedCharacterId of pagedNamedCharacterIds">
+                            <a [routerLink]="['/characters', namedCharacterId]">
+                                {{ (getCharacterName(namedCharacterId) | async) }}
+                            </a>
+                        </mat-list-item>
+                    </mat-list>
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizeNamedCharacters" [length]="book.characterids.length" (page)="pageNamedCharacters($event)">
+                    </mat-paginator>
+                </ng-container>
+            </div>
+            <div id="povCharacters">
 
-    </mat-list>
+
+                <ng-container *ngIf="book.povCharactersids.length > 0; else noPOVCharacters">
+                    <strong>POV Characters:</strong>
+                    <mat-list>
+                        <mat-list-item *ngFor="let povCharacterId of pagedPOVCharacterIds">
+                            <a [routerLink]="['/characters', povCharacterId]">
+                                {{ (getCharacterName(povCharacterId) | async) }}
+                            </a>
+                        </mat-list-item>
+                    </mat-list>
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="pageSizePOVCharacters" [length]="book.povCharactersids.length" (page)="pagePOVCharacters($event)">
+                    </mat-paginator>
+                </ng-container>
+            </div>
+        </mat-card-content>
+        <ng-template #noPOVCharacters>
+            <mat-card-actions>
+                <p class="no-data">No POV characters found for this book</p>
+            </mat-card-actions>
+        </ng-template>
+    </mat-card>
 </div>

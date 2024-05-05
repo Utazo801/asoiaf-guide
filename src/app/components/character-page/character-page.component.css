@@ -1,0 +1,29 @@
+.character-container {
+  text-align: center;
+}
+
+.list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mat-list {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.paging {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.paging button {
+  margin: 0 5px;
+}
+
+.paging button:first-child {
+  margin-right: 10px;
+}

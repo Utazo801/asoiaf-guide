@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 import { Character } from '../../models/character.type';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CharacterService } from '../../services/character.service';
-import { Observable, switchMap } from 'rxjs';
+import _ from 'lodash';
+import { HouseService } from '../../services/house.service';
+import { Observable } from 'rxjs';
+import { BookService } from '../../services/book.service';
 
 @Component({
   selector: 'app-character-details',
@@ -12,11 +15,15 @@ import { Observable, switchMap } from 'rxjs';
 export class CharacterDetailsComponent {
   id!: number;
   character!: Character; // Define a property to hold the character details
+  houseNames!: string[];
+  bookNames!: string[];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private characterService: CharacterService
+    private characterService: CharacterService,
+    private houseService: HouseService,
+    private bookService: BookService
   ) {}
   ngOnInit(): void {
     const characterId = this.route.snapshot.paramMap.get('id') ?? 'no';
@@ -25,8 +32,6 @@ export class CharacterDetailsComponent {
     }
     this.id = parseInt(characterId);
     this.getCharacter(this.id);
-    if (this.character === null) {
-    }
   }
 
   getCharacter(id: number) {
@@ -45,5 +50,21 @@ export class CharacterDetailsComponent {
         console.error('Error fetching character:', error);
       }
     );
+  }
+
+  parseURLs(url: string): number {
+    let array = url.split('/');
+    let id = parseInt(array[array.length - 1]);
+    return id;
+  }
+  getCharacterName(id: number): Observable<string> {
+    return this.characterService.getCharacterName(id);
+  }
+
+  getHouseName(id: number): Observable<string> {
+    return this.houseService.getHouseName(id);
+  }
+  getBookName(id: number): Observable<string> {
+    return this.bookService.getBookName(id);
   }
 }

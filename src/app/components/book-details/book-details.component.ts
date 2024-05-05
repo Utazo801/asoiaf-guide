@@ -4,7 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from '../../services/book.service';
 import { CharacterService } from '../../services/character.service';
 import { Character } from '../../models/character.type';
-import _ from 'lodash';
+import _, { max } from 'lodash';
+import { SearchResult } from '../../models/search-result.type';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-book-details',
@@ -15,10 +17,25 @@ export class BookDetailsComponent {
   id!: number;
   book!: Book;
   characters!: Character[];
-  pageSizeCharacters: number = 5; // Number of characters per page
+
+  currentPageOfNamedCharacters: number = 0;
+  currentPageOfPOVCharacters: number = 0;
+
+  maxPageNamedCharacters: number = 0;
+  maxPagePovCharacters: number = 0;
+
+  pageSizeNamedCharacters: number = 5; // Number of characters per page
   pageSizePOVCharacters: number = 5; // Number of POV characters per page
-  pagedCharacterIds: number[] = []; // Array to hold paginated character ids
+
+  pagedNamedCharacterIds: number[] = []; // Array to hold paginated character ids
   pagedPOVCharacterIds: number[] = []; // Array to hold paginated POV character ids
+
+  NamedCharacterIds: number[] = [];
+  POVCharacterIds: number[] = [];
+
+  NamedCharacterNames: Observable<string>[] = [];
+  POVCharacterNames: Observable<string>[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -34,6 +51,12 @@ export class BookDetailsComponent {
     this.id = parseInt(bookId);
     this.getBook(this.id);
     this.getCharacters();
+    this.maxPageNamedCharacters = Math.ceil(
+      this.book.characterids.length / this.pageSizeNamedCharacters
+    );
+    this.maxPagePovCharacters = Math.ceil(
+      this.book.povCharactersids.length / this.pageSizePOVCharacters
+    );
   }
   getBook(id: number) {
     this.bookService.getBookByID(id).subscribe(
@@ -52,20 +75,47 @@ export class BookDetailsComponent {
       }
     );
   }
-  pageCharacters(event: any) {
-    const startIndex = event.pageIndex * event.pageSize;
-    const endIndex = startIndex + event.pageSize;
-    this.pagedCharacterIds = this.book.characterids.slice(startIndex, endIndex);
-  }
-
   // Method to paginate POV characters
   pagePOVCharacters(event: any) {
     const startIndex = event.pageIndex * event.pageSize;
     const endIndex = startIndex + event.pageSize;
+    this.pageSizePOVCharacters = event.pageSize;
     this.pagedPOVCharacterIds = this.book.povCharactersids.slice(
       startIndex,
       endIndex
     );
+
+    const currentPagePOVMemberIds = this.POVCharacterIds.slice(
+      startIndex,
+      endIndex
+    );
+    this.POVCharacterNames = this.loadPovCharacterArray(
+      currentPagePOVMemberIds
+    );
+    this.currentPageOfPOVCharacters = event.pageIndex;
+    this.maxPagePovCharacters =
+      Math.ceil(this.POVCharacterIds.length / event.pageSize) - 1;
+  }
+
+  pageNamedCharacters(event: any) {
+    const startIndex = event.pageIndex * event.pageSize;
+    const endIndex = startIndex + event.pageSize;
+    this.pageSizeNamedCharacters = event.pageSize;
+    this.pagedNamedCharacterIds = this.book.characterids.slice(
+      startIndex,
+      endIndex
+    );
+
+    const currentPageNamedMemberIds = this.NamedCharacterIds.slice(
+      startIndex,
+      endIndex
+    );
+    this.NamedCharacterNames = this.loadNamedCharacterArray(
+      currentPageNamedMemberIds
+    );
+    this.currentPageOfNamedCharacters = event.pageIndex;
+    this.maxPageNamedCharacters =
+      Math.ceil(this.NamedCharacterIds.length / event.pageSize) - 1;
   }
 
   getCharacters() {
@@ -73,9 +123,54 @@ export class BookDetailsComponent {
       .getCharacters()
       .subscribe((r) => (this.characters = r.results));
   }
-  getCharacterName(id: number) {
-    //Look for character in cache, if it isnt there, fetch it from api and store in a different cache
-    let character = _.find(this.characters || [], (c) => c.id == id);
-    return character && character.name;
+
+  getCharacterName(id: number): Observable<string> {
+    return this.characterService.getCharacterName(id);
+  }
+
+  private loadNamedCharacterArray(
+    characterIds: number[]
+  ): Observable<string>[] {
+    return this.NamedCharacterIds.map((id) => this.getCharacterName(id));
+  }
+  private loadPovCharacterArray(characterIds: number[]): Observable<string>[] {
+    return this.POVCharacterIds.map((id) => this.getCharacterName(id));
+  }
+
+  updatePagedPOVCharacterIds() {
+    const startIndex =
+      this.currentPageOfPOVCharacters * this.pageSizePOVCharacters;
+    const endIndex = Math.min(
+      startIndex + this.pageSizePOVCharacters,
+      this.POVCharacterIds.length
+    );
+
+    const currentPagePOVMemberIds = this.POVCharacterIds.slice(
+      startIndex,
+      endIndex
+    );
+
+    this.POVCharacterNames = this.loadPovCharacterArray(
+      currentPagePOVMemberIds
+    );
+    this.pagedPOVCharacterIds = currentPagePOVMemberIds;
+  }
+  updatePagedNamedCharacterIds() {
+    const startIndex =
+      this.currentPageOfNamedCharacters * this.pageSizeNamedCharacters;
+    const endIndex = Math.min(
+      startIndex + this.pageSizePOVCharacters,
+      this.NamedCharacterIds.length
+    );
+
+    const currentPageNamedMemberIds = this.POVCharacterIds.slice(
+      startIndex,
+      endIndex
+    );
+
+    this.POVCharacterNames = this.loadPovCharacterArray(
+      currentPageNamedMemberIds
+    );
+    this.pagedPOVCharacterIds = currentPageNamedMemberIds;
   }
 }

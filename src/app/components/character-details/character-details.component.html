@@ -1,27 +1,133 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>{{ character.name || character.aliases[0] }}</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <p>ID: {{ character.id }}</p>
+<div class="container">
 
-    <p>Gender: {{ character.gender }}</p>
-    <p>Culture: {{ character.culture }}</p>
-    <p>Born: {{ character.born }}</p>
-    <p>Died: {{ character.died }}</p>
-    <div>
-      <p>Aliases: </p>
-      <mat-list role="list">
-        <mat-list-item role="listitem" *ngFor="let alias of character.aliases">{{alias}}</mat-list-item>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title style="font-family: Rosarivo; font-weight: bold;">{{ character.name || character.aliases[0] }}</mat-card-title>
 
-      </mat-list>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/characters">Go Back</button>
+      </mat-card-actions>
+      <div>
+        <p>Title: </p>
+        <mat-list role="list" class="character-list">
+          <mat-list-item role="listitem" style="font-family: Rosarivo;" *ngFor="let title of character.titles">
+            <p style="font-family: Rosarivo;">{{ title }}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <p>Gender: <ng-container *ngIf="character.gender; else noGender">
+          {{ character.gender }}
+        </ng-container></p>
+      <p>Culture: <ng-container *ngIf="character.culture; else noCulture">
+          {{ character.culture }}
+        </ng-container></p>
+      <p>Father:
+        <a [routerLink]="['/characters', parseURLs(character.father)]" *ngIf="character.father; else noFather">
+          {{ (getCharacterName(parseURLs(character.father))| async) }}
+        </a>
+      </p>
+      <p>Mother:
+        <a [routerLink]="['/characters', parseURLs(character.mother)]" *ngIf="character.mother; else noMother">
+          {{(getCharacterName(parseURLs(character.mother))| async)}}
+        </a>
+      </p>
+      <p>Spouse:
+        <a [routerLink]="['/characters', parseURLs(character.spouse)]" *ngIf="character.spouse; else noSpouse">
+          {{(getCharacterName(parseURLs(character.spouse))| async)}}
+        </a>
+      </p>
+      <p>Born: <ng-container *ngIf="character.born; else noBirthDate">
+          {{ character.born }}
+        </ng-container>
+      </p>
+      <p>Died: <ng-container *ngIf="character.died; else noDeathDate">
+          {{ character.died }}
+        </ng-container></p>
+      <div>
+        <p>Aliases: </p>
+        <mat-list role="list" class="character-list">
+          <mat-list-item role="listitem" style="font-family: Rosarivo;" *ngFor="let alias of character.aliases">
+            <p style="font-family: Rosarivo;">{{ alias }}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div>
+        <p>Allegiances: </p>
+        <mat-list role="list" *ngIf="character.houseids; else NoAllegiances" class="character-list">
+          <mat-list-item role="listitem" *ngFor="let house of character.houseids">
+            <a [routerLink]="['/houses', house]">{{(getHouseName(house) |async)}}</a>
+          </mat-list-item>
+        </mat-list>
+      </div>
 
-    </div>
-    <div>
-      <p>Allegiances: </p>
-      <span *ngFor="let house of character.houseids">{{house}}</span>
-    </div>
-    <!-- Add more details as needed -->
-  </mat-card-content>
+      <div>
+        <p>Books: </p>
+        <mat-list role="list" *ngIf="character.books; else noBookMention" class="character-list">
+          <mat-list-item role="listitem" *ngFor="let book of character.books">
+            <a [routerLink]="['/books', parseURLs(book)]">{{(getBookName(parseURLs(book)) |async)}}</a>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div>
+        <p>POV Books: </p>
+        <mat-list role="list" *ngIf="character.povBooks; else noPOV" class="character-list">
+          <mat-list-item role="listitem" *ngFor="let book of character.povBooks">
+            <a [routerLink]="['/books', parseURLs(book)]">{{(getBookName(parseURLs(book)) |async)}}</a>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <p>Played by: <ng-container *ngIf="character.playedBy; else noActor">
+          {{ character.playedBy }}
+        </ng-container></p>
+      <div>
+        <p>TV Series: </p>
+        <mat-list role="list" *ngIf="character.tvSeries; else noTVAppearance" class="character-list">
+          <mat-list-item role="listitem" *ngFor="let tv of character.tvSeries">
+            <p>{{tv}}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
 
-</mat-card>
+    </mat-card-content>
+
+    <ng-template #NoAllegiances>
+      <p class="no-data">No allegiance for this character</p>
+    </ng-template>
+    <ng-template #noFather>
+      <p class="no-data">No father for this character</p>
+    </ng-template>
+    <ng-template #noMother>
+      <p class="no-data">No mother for this character</p>
+    </ng-template>
+    <ng-template #noSpouse>
+      <p class="no-data">No spouse for this character</p>
+    </ng-template>
+
+    <ng-template #noBirthDate>
+      <p class="no-data">No birht date for this character</p>
+    </ng-template>
+    <ng-template #noDeathDate>
+      <p class="no-data">No death date for this character</p>
+    </ng-template>
+    <ng-template #noCulture>
+      <p class="no-data">No culture found for this character</p>
+    </ng-template>
+    <ng-template #noGender>
+      <p class="no-data">No gender found for this character</p>
+    </ng-template>
+    <ng-template #noBookMention>
+      <p class="no-data">This character is not mentioned in any book</p>
+    </ng-template>
+    <ng-template #noPOV>
+      <p class="no-data">This character has no POV chapter</p>
+    </ng-template>
+    <ng-template #noTVAppearance>
+      <p class="no-data">This character hasn't appeared on TV yet</p>
+    </ng-template>
+    <ng-template #noActor>
+      <p class="no-data">This character hasn't been played by any actor yet</p>
+    </ng-template>
+  </mat-card>
+</div>

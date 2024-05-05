@@ -1,1 +1,101 @@
-<p>house-details works!</p>
+<div class="container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title style="font-family: Rosarivo; font-weight: bold;">{{ house.name }}</mat-card-title>
+            <mat-card-subtitle style="font-family: Rosarivo; font-weight: bold;">{{ house.region }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-card-actions>
+                <button mat-button color="primary" routerLink="/houses">Go Back</button>
+            </mat-card-actions>
+            <p><strong>Coat of Arms:</strong> {{ house.coatOfArms }}</p>
+            <p><strong>Words:</strong>
+                <ng-container *ngIf="house.words; else noWord">{{ house.words }}</ng-container>
+            </p>
+            <p><strong>Titles:</strong><br>
+                <span *ngFor="let title of house.titles">{{ title }}<br></span>
+            </p>
+            <p><strong>Seats:</strong><br>
+                <span *ngFor="let seat of house.seats">{{ seat }}<br></span>
+            </p>
+            <p><strong>Ancestral Weapons:</strong><br>
+                <ng-container *ngIf="house.ancestralWeapons.length > 0; else noAncestralWeapon">
+                    <span *ngFor="let weapon of house.ancestralWeapons">{{ weapon }}<br></span>
+                </ng-container>
+            </p>
+            <p><strong>Overlord:</strong>
+                <ng-container *ngIf="house.overlord; else NoOverlord">
+                    <a [routerLink]="['/houses', house.overlordid]">{{ (getHouseName(house.overlordid) | async) }}</a>
+                </ng-container>
+            </p>
+            <div id="importantCharacters">
+                <p><strong>Current Lord:</strong>
+                    <ng-container *ngIf="house.currentLordid; else NoCurrentLord">
+                        <a [routerLink]="['/characters', house.currentLordid]">
+                            {{ (getCharacterName(house.currentLordid) | async) }}
+                        </a>
+                    </ng-container>
+                </p>
+                <p><strong>Heir:</strong>
+                    <ng-container *ngIf="house.heirid; else NoHeir">
+                        <a [routerLink]="['/characters', house.heirid]">
+                            {{ (getCharacterName(house.heirid) | async) }}
+                        </a>
+                    </ng-container>
+                </p>
+                <p><strong>Founder:</strong>
+                    <ng-container *ngIf="house.founderid; else NoFounder">
+                        <a [routerLink]="['/characters', house.founderid]">
+                            {{ (getCharacterName(house.founderid) | async) }}
+                        </a>
+                    </ng-container>
+                </p>
+            </div>
+            <p><strong>Founded:</strong> {{ house.founded }}</p>
+            <p><strong>Died Out:</strong> <span *ngIf="house.diedOut; else stillAlive">{{ house.diedOut }}</span></p>
+            <p><strong>Cadet Branches:</strong><br>
+                <ng-container *ngIf="house.caderBranches; else noCadetBranch">
+                    <a *ngFor="let branch of house.caderBranches">{{ (getCharacterName(ParseCadetURls(branch)) | async) }}<br></a>
+                </ng-container>
+            </p>
+            <div id="swornMembers">
+                <p><strong>Sworn Characters:</strong></p>
+                <mat-paginator [length]="swornMemberIds.length" [pageSize]="pageSize" [pageSizeOptions]="[5,10,20]" (page)="pageSwornCharacters($event)">
+                </mat-paginator>
+                <mat-list>
+                    <mat-list-item *ngFor="let swornmember of pagedSwornMembersIds">
+                        <a [routerLink]="['/characters', swornmember]">
+                            {{ (getCharacterName(swornmember) | async) }}
+                        </a>
+                    </mat-list-item>
+                </mat-list>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <ng-template #NoOverlord>
+        <p class="no-data">No overlord for this house</p>
+    </ng-template>
+    <ng-template #NoCurrentLord>
+        <p class="no-data">No current lord for this house</p>
+    </ng-template>
+    <ng-template #NoHeir>
+        <p class="no-data">No current heir for this house</p>
+    </ng-template>
+    <ng-template #NoFounder>
+        <p class="no-data">No founder for this house</p>
+    </ng-template>
+
+    <ng-template #stillAlive>
+        <p class="no-data">This house is still alive</p>
+    </ng-template>
+    <ng-template #noAncestralWeapon>
+        <p class="no-data">This house has no ancestral weapon</p>
+    </ng-template>
+    <ng-template #noWord>
+        <p class="no-data">This house has no word</p>
+    </ng-template>
+    <ng-template #noCadetBranch>
+        <p class="no-data">This house has no cadet branches</p>
+    </ng-template>
+</div>

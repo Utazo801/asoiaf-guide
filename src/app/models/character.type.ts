@@ -16,5 +16,5 @@ export interface Character {
   books: string[]; //urls
   povBooks: string[]; //url
   tvSeries: string[];
-  playerBy: string;
+  playedBy: string;
 }

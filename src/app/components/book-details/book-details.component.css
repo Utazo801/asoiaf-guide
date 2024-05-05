@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  margin: 20px auto;
+}
+
+.book-card {
+  width: 100%;
+}
+
+.book-card mat-card-title {
+  font-family: Rosarivo;
+  font-weight: bold;
+}
+
+.book-card mat-list {
+  width: 100%;
+}
+
+.book-card mat-list-item {
+  border-bottom: 1px solid #ccc;
+}
+
+.book-card mat-list-item:last-child {
+  border-bottom: none;
+}
+
+.book-card .no-data {
+  color: #888;
+  font-style: italic;
+  display: inline;
+}

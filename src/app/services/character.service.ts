@@ -85,53 +85,6 @@ export class CharacterService {
     );
   }
 
-  // getAllCharacters(): Observable<Character[]> {
-  //   // Make the initial API call to get the first page of characters
-  //   let page = 1;
-  //   let pageSize = 50;
-  //   let queryparams = new HttpParams()
-  //     .append('page', page.toString())
-  //     .append('pageSize', pageSize.toString());
-  //   return this.http.get<Character[]>(
-  //     `${this.apiUrl}?page=${page}&pageSize=${pageSize}`
-  //   );
-  //   // .pipe(
-  //   //   concatMap((response) => {
-  //   //     let characters = response; // Store the characters from the first page
-  //   //     let pages = 43; // Calculate the number of pages
-  //   //     const requests: Observable<Character[]>[] = []; // Array to store requests for subsequent pages
-  //   //     // Loop through pages starting from the second page
-  //   //     for (let i = 2; i <= pages; i++) {
-  //   //       console.log(i);
-  //   //       // Push requests for subsequent pages into the requests array
-  //   //       requests.push(
-  //   //         this.http
-  //   //           .get<Character[]>(`${this.apiUrl}?pageSize=50&page=${i}`)
-  //   //           .pipe(
-  //   //             tap((char) => {
-  //   //               characters = characters.concat(char);
-  //   //             })
-  //   //           )
-  //   //       );
-  //   //     }
-  //   //     // If there are more than one page, make another request for the last page
-  //   //     return requests.length > 0
-  //   //       ? forkJoin(requests).pipe(
-  //   //           map((responses: Character[][]) => {
-  //   //             // Concatenate characters from all the pages
-  //   //             characters = responses.reduce(
-  //   //               (acc: Character[], val: Character[]) => acc.concat(val),
-  //   //               characters
-  //   //             );
-  //   //             this.saveArray(characters);
-  //   //             return characters;
-  //   //           })
-  //   //         )
-  //   //       : of(characters); // If there is only one page, return characters from the first page
-  //   //   })
-  //   // );
-  // }
-
   private fetchCharactersFromApi(options?: {
     page?: number;
     pageSize?: number;
@@ -165,13 +118,7 @@ export class CharacterService {
       .pipe(
         tap((characters) => {
           characters.forEach((character) => {
-            const urlParts = character.url.split('/');
-            character.id = parseInt(urlParts[urlParts.length - 1]);
-            character.allegiances.forEach((a) => {
-              const urlParts = a.split('/');
-              character.houseids = [];
-              character.houseids.push(parseInt(urlParts[urlParts.length - 1]));
-            });
+            this.CharacterProcessing(character);
           });
           this.saveArray(characters);
         })
@@ -181,10 +128,7 @@ export class CharacterService {
   fetchFromAPIByID(id: number): Observable<Character | null> {
     return this.http.get<Character>(`${this.apiUrl}/${id}`).pipe(
       map((character) => {
-        character.allegiances.forEach((a) => {
-          const urlParts = a.split('/');
-          character.houseids.push(parseInt(urlParts[urlParts.length - 1]));
-        });
+        this.CharacterProcessing(character);
         this.saveSingle(character);
         return character; // Return the character
       }),
@@ -194,15 +138,15 @@ export class CharacterService {
       })
     );
   }
-  saveSingle(character: Character) {
-    let tempChars: Character[] = [];
-    const cachedData = localStorage.getItem(this.storageKey);
-    if (cachedData) {
-      tempChars = JSON.parse(cachedData);
-    }
-    tempChars.push(character);
-    localStorage.setItem(this.storageKey, JSON.stringify(tempChars));
-    this.getCharacters();
+
+  private CharacterProcessing(character: Character) {
+    const urlParts = character.url.split('/');
+    character.id = parseInt(urlParts[urlParts.length - 1]);
+    character.allegiances.forEach((a) => {
+      const urlParts = a.split('/');
+      character.houseids = [];
+      character.houseids.push(parseInt(urlParts[urlParts.length - 1]));
+    });
   }
 
   getCharacterByID(id: number): Observable<Character | null> {
@@ -213,7 +157,6 @@ export class CharacterService {
       if (foundCharacter) {
         return of(foundCharacter);
       } else {
-        // If character is not found in the cached data, fetch it from the API
         return this.fetchFromAPIByID(id);
       }
     } else {
@@ -221,6 +164,40 @@ export class CharacterService {
       return this.fetchFromAPIByID(id);
     }
   }
+
+  getCharacterName(id: number): Observable<string> {
+    // Look for character in cache
+    const existingData = localStorage.getItem(this.storageKey);
+    let cachedCharacters: Character[] = [];
+    if (existingData) {
+      cachedCharacters = JSON.parse(existingData);
+    }
+    let character = _.find(cachedCharacters || [], (c) => c.id == id);
+
+    if (character && character.name) {
+      return of(character.name);
+    } else if (character && character.aliases && character.aliases.length > 0) {
+      return of(character.aliases[0]);
+    } else {
+      // If character is not found in cache, fetch it from the API
+      return this.getCharacterByID(id).pipe(
+        map((character) => {
+          if (character && character.name) {
+            return character.name;
+          } else if (
+            character &&
+            character.aliases &&
+            character.aliases.length > 0
+          ) {
+            return character.aliases[0];
+          } else {
+            return character!.id.toString();
+          }
+        })
+      );
+    }
+  }
+
   private saveArray(characters: Character[]) {
     // Get existing data from localStorage
     const existingData = localStorage.getItem(this.storageKey);
@@ -230,7 +207,6 @@ export class CharacterService {
     if (existingData) {
       cachedCharacters = JSON.parse(existingData);
     }
-
     // Check for duplicates and add new data
     characters.forEach((newCharacter) => {
       if (!cachedCharacters.some((c) => c.id === newCharacter.id)) {
@@ -239,8 +215,23 @@ export class CharacterService {
     });
 
     // Save updated data back to localStorage
+    cachedCharacters = cachedCharacters.sort((a, b) => a.id - b.id);
     this.characters = cachedCharacters;
     const characterData = JSON.stringify(cachedCharacters);
     localStorage.setItem(this.storageKey, characterData);
+  }
+
+  saveSingle(character: Character) {
+    let tempChars: Character[] = [];
+    const cachedData = localStorage.getItem(this.storageKey);
+    if (cachedData) {
+      tempChars = JSON.parse(cachedData);
+      if (!tempChars.some((c) => c.id === character.id)) {
+        tempChars.push(character);
+      }
+    }
+    tempChars = tempChars.sort((a, b) => a.id - b.id);
+    localStorage.setItem(this.storageKey, JSON.stringify(tempChars));
+    this.getCharacters();
   }
 }

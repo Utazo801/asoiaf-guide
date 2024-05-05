@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  margin: 20px auto;
+}
+
+mat-card {
+  width: 100%;
+}
+
+mat-card-title,
+mat-card-subtitle {
+  font-family: Rosarivo;
+  font-weight: bold;
+}
+
+mat-card-content {
+  padding: 16px;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+p {
+  margin-bottom: 8px;
+}
+
+strong {
+  font-weight: bold;
+}
+
+#swornMembers {
+  margin-top: 20px;
+}
+
+#swornMembers a {
+  text-decoration: none;
+}
+
+#swornMembers a:hover {
+  text-decoration: underline;
+}
+
+mat-list-item {
+  border-bottom: 1px solid #ccc;
+}
+
+mat-list-item:last-child {
+  border-bottom: none;
+}
+
+#importantCharacters p {
+  margin-bottom: 5px;
+}
+
+#importantCharacters a {
+  text-decoration: none;
+}
+
+#importantCharacters a:hover {
+  text-decoration: underline;
+}
+.no-data {
+  display: inline;
+  color: #888;
+  font-style: italic;
+}

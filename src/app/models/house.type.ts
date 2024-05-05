@@ -9,13 +9,17 @@ export interface House {
   words: string;
   titles: string[];
   seats: string[];
-  currentLord: string;
-  heir: string;
-  overLord: string;
+  currentLord: string; //character
+  currentLordid: number;
+  heir: string; //character
+  heirid: number;
+  overlord: string; //house
+  overlordid: number;
   founded: string;
-  founder: string;
+  founder: string; //character
+  founderid: number;
   diedOut: string;
   ancestralWeapons: string[];
-  caderBranches: string[];
-  swornMembers: string[];
+  caderBranches: string[]; //houses
+  swornMembers: string[]; //characters
 }

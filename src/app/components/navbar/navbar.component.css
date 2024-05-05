@@ -5,3 +5,14 @@ a {
   color: white;
   font-family: "Rosarivo";
 }
+.menu-buttons {
+  display: flex;
+}
+
+.menu-button {
+  margin-right: 10px;
+}
+
+#title {
+  margin-right: auto;
+}

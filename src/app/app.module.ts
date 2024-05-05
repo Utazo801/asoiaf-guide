@@ -36,6 +36,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTreeModule } from '@angular/material/tree';
 
 @NgModule({
   imports: [
@@ -51,6 +52,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatListModule,
     MatCardModule,
     MatPaginatorModule,
+    MatTreeModule,
   ],
   declarations: [
     AppComponent,

@@ -1,17 +1,7 @@
 <mat-form-field class="example-form-field">
     <mat-label>Search</mat-label>
-    <input matInput type="text" [(ngModel)]="value">
-    @if (value) {
-    <button matSuffix mat-icon-button aria-label="" (click)="value=''">
+    <input matInput type="text" [(ngModel)]="value" class="search-input">
+    <button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
         <mat-icon>close</mat-icon>
     </button>
-    }
-</mat-form-field>
-<mat-form-field>
-    <mat-label>Page Size</mat-label>
-    <mat-select>
-        <mat-option *ngFor="let size of pageSizes" [value]="size">
-            {{size}}
-        </mat-option>
-    </mat-select>
 </mat-form-field>

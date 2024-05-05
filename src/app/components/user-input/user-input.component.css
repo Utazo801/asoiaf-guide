@@ -1,9 +1,18 @@
-.example-form-field {
-  width: 200px;
-}
 body {
   font-family: "Rosarivo";
 }
-#searchfield {
-  font-family: "Rosarivo";
+.example-form-field {
+  width: 200px;
+  margin-right: 20px;
+}
+
+.search-input {
+  font-family: "Rosarivo", serif;
+  width: 100px; /* Adjust the width as per your requirement */
+  padding: 8px; /* Adjust the padding as per your requirement */
+  box-sizing: border-box;
+}
+
+.page-size-field {
+  width: 150px;
 }

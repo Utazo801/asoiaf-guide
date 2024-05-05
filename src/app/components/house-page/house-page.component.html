@@ -1,13 +1,17 @@
-<mat-list>
-    <mat-list-item *ngFor="let house of (houses| async)?.results">
-        <a [routerLink]="['/houses', house.id]">{{ house.name }}</a>
-    </mat-list-item>
-</mat-list>
-
+<div class="house-container">
+    <div>
+        <p>Choose one of the houses of this world to know more about them</p>
+    </div>
+    <div class="list-container">
+        <mat-list>
+            <mat-list-item *ngFor="let house of (houses | async)?.results">
+                <a [routerLink]="['/houses', house.id]">{{ house.name }}</a>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</div>
 
 <div class="paging">
-    <!-- <button mat-flat-button (click)="currentPage = 1;getCharacters()" [disabled]="currentPage === 1">First</button> -->
     <button mat-flat-button (click)="prevPage()" [disabled]="currentPage === 1">Previous Page</button>
     <button mat-flat-button (click)="nextPage()">Next Page</button>
-    <!-- <button mat-flat-button (click)="currentPage=maxPages;" [disabled]="currentPage === maxPages">Last</button> -->
 </div>
