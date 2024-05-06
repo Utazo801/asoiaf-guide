@@ -7,6 +7,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { CharacterDetailsComponent } from './components/character-details/character-details.component';
 import { BookDetailsComponent } from './components/book-details/book-details.component';
 import { HouseDetailsComponent } from './components/house-details/house-details.component';
+import { SearchResultsComponent } from './components/search-result/search-result.component';
 
 export const routes: Routes = [
   { path: '', component: AsoiafGuideComponent },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'books', component: BookPageComponent },
   { path: 'books/:id', component: BookDetailsComponent },
   { path: 'page-not-found', component: PageNotFoundComponent },
+  { path: 'search', component: SearchResultsComponent },
   { path: '**', component: PageNotFoundComponent },
 ];

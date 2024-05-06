@@ -37,6 +37,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTreeModule } from '@angular/material/tree';
+import { SearchService } from './services/search.service';
+import { SearchResultsComponent } from './components/search-result/search-result.component';
 
 @NgModule({
   imports: [
@@ -65,11 +67,14 @@ import { MatTreeModule } from '@angular/material/tree';
     CharacterDetailsComponent,
     HouseDetailsComponent,
     BookDetailsComponent,
+    SearchResultsComponent,
   ],
   providers: [
     CharacterService,
     HouseService,
     BookService,
+    SearchService,
+
     provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent],

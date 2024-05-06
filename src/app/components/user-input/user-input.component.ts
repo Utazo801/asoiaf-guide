@@ -1,11 +1,24 @@
 import { Component } from '@angular/core';
+import { SearchService } from '../../services/search.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-input',
   templateUrl: './user-input.component.html',
-  styleUrl: './user-input.component.css',
+  styleUrls: ['./user-input.component.css'],
 })
 export class UserInputComponent {
   value = '';
-  pageSizes: number[] = [10, 20, 30, 40, 50];
+
+  constructor(private searchService: SearchService, private router: Router) {}
+
+  onSearch() {
+    this.searchService.setSearchTerm(this.value);
+    this.router.navigate(['search']);
+  }
+
+  clear() {
+    this.value = '';
+    this.searchService.setSearchTerm('');
+  }
 }

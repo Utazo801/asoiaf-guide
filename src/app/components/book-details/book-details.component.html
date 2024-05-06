@@ -31,7 +31,7 @@
 
             <div id="namedCharacters">
                 <strong>Characters:</strong>
-                <ng-container *ngIf="book.povCharactersids.length > 0; else noPOVCharacters">
+                <ng-container *ngIf="book.characterids.length > 0; else noNamedCharacters">
                     <mat-list>
                         <mat-list-item *ngFor="let namedCharacterId of pagedNamedCharacterIds">
                             <a [routerLink]="['/characters', namedCharacterId]">
@@ -63,6 +63,11 @@
         <ng-template #noPOVCharacters>
             <mat-card-actions>
                 <p class="no-data">No POV characters found for this book</p>
+            </mat-card-actions>
+        </ng-template>
+        <ng-template #noNamedCharacters>
+            <mat-card-actions>
+                <p class="no-data">No named characters found for this book</p>
             </mat-card-actions>
         </ng-template>
     </mat-card>

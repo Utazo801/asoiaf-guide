@@ -99,6 +99,7 @@ export class HouseDetailsComponent {
       endIndex
     );
     this.swornMemberNames = this.loadSwornMembers(currentPageSwornMemberIds);
+    this.pagedSwornMembersIds = currentPageSwornMemberIds;
     this.currentPage = event.pageIndex;
     this.maxPage = Math.ceil(this.swornMemberIds.length / event.pageSize) - 1;
   }
@@ -116,18 +117,5 @@ export class HouseDetailsComponent {
 
     this.swornMemberNames = this.loadSwornMembers(currentPageSwornMemberIds);
     this.pagedSwornMembersIds = currentPageSwornMemberIds;
-  }
-  prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-      this.updatePagedSwornCharacter();
-    }
-  }
-
-  nextPage() {
-    if (this.currentPage < this.maxPage) {
-      this.currentPage++;
-      this.updatePagedSwornCharacter();
-    }
   }
 }

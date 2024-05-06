@@ -1,0 +1,50 @@
+<div>
+    <h2> Search Results:</h2>
+    <div *ngIf="characterSearchResult | async as characterSearchResult">
+        <h4>Characters</h4>
+        <mat-list>
+            <mat-list-item *ngFor="let character of characterSearchResult.results">
+                <a [routerLink]="['/characters', character.id]">
+                    {{ character.name || character.aliases[0] }}
+                </a>
+            </mat-list-item>
+        </mat-list>
+        <mat-paginator [length]="characterSearchResult.results" [pageSize]="characterSearchResult.pageSize" [pageSizeOptions]="[5, 10, 25]" (page)="pageChanged($event, 'character')">
+        </mat-paginator>
+        <ng-container *ngIf="characterSearchResult.results.length === 0">
+            <p class="no-data">No characters found</p>
+        </ng-container>
+    </div>
+
+    <div *ngIf="houseSearchResult | async as houseSearchResult">
+        <h4>Houses</h4>
+        <mat-list>
+            <mat-list-item *ngFor="let house of houseSearchResult.results">
+                <a [routerLink]="['/houses', house.id]">
+                    {{ house.name }}
+                </a>
+            </mat-list-item>
+        </mat-list>
+        <mat-paginator [length]="houseSearchResult.results" [pageSize]="houseSearchResult.pageSize" [pageSizeOptions]="[5, 10, 25]" (page)="pageChanged($event, 'house')">
+        </mat-paginator>
+        <ng-container *ngIf="houseSearchResult.results.length === 0">
+            <p class="no-data">No houses found</p>
+        </ng-container>
+    </div>
+
+    <div *ngIf="bookSearchResult | async as bookSearchResult">
+        <h4>Books</h4>
+        <mat-list>
+            <mat-list-item *ngFor="let book of bookSearchResult.results">
+                <a [routerLink]="['/books', book.id]">
+                    {{ book.name }}
+                </a>
+            </mat-list-item>
+        </mat-list>
+        <mat-paginator [length]="bookSearchResult.results" [pageSize]="bookSearchResult.pageSize" [pageSizeOptions]="[5, 10, 25]" (page)="pageChanged($event, 'book')">
+        </mat-paginator>
+        <ng-container *ngIf="bookSearchResult.results.length === 0">
+            <p class="no-data">No books found</p>
+        </ng-container>
+    </div>
+</div>

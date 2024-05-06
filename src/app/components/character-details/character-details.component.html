@@ -47,7 +47,7 @@
         </ng-container></p>
       <div>
         <p>Aliases: </p>
-        <mat-list role="list" class="character-list">
+        <mat-list *ngIf="character.aliases.length> 0; else noAliases" role="list" class="character-list">
           <mat-list-item role="listitem" style="font-family: Rosarivo;" *ngFor="let alias of character.aliases">
             <p style="font-family: Rosarivo;">{{ alias }}</p>
           </mat-list-item>
@@ -72,18 +72,18 @@
       </div>
       <div>
         <p>POV Books: </p>
-        <mat-list role="list" *ngIf="character.povBooks; else noPOV" class="character-list">
+        <mat-list role="list" *ngIf="character.povBooks. length >0; else noPOV" class="character-list">
           <mat-list-item role="listitem" *ngFor="let book of character.povBooks">
             <a [routerLink]="['/books', parseURLs(book)]">{{(getBookName(parseURLs(book)) |async)}}</a>
           </mat-list-item>
         </mat-list>
       </div>
-      <p>Played by: <ng-container *ngIf="character.playedBy; else noActor">
+      <p>Played by: <ng-container *ngIf="character.playedBy.length >0; else noActor">
           {{ character.playedBy }}
         </ng-container></p>
       <div>
         <p>TV Series: </p>
-        <mat-list role="list" *ngIf="character.tvSeries; else noTVAppearance" class="character-list">
+        <mat-list role="list" *ngIf="character.tvSeries.length > 0; else noTVAppearance" class="character-list">
           <mat-list-item role="listitem" *ngFor="let tv of character.tvSeries">
             <p>{{tv}}</p>
           </mat-list-item>
@@ -128,6 +128,10 @@
     </ng-template>
     <ng-template #noActor>
       <p class="no-data">This character hasn't been played by any actor yet</p>
+    </ng-template>
+
+    <ng-template #noAliases>
+      <p class="no-data">This character has no aliases</p>
     </ng-template>
   </mat-card>
 </div>
