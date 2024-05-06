@@ -19,22 +19,39 @@ export class CharacterPageComponent {
   pageSize: number = 10;
   searchTerm: string = '';
   maxPages: number = 0;
+  houses!: House[]; //An array containing houses associated with characters.
+  characters!: Observable<SearchResult<Character>>; //An observable emitting search results of characters.
 
+  /**
+   * Constructor of the `CharacterPageComponent` class.
+   * @param characterService - The service for fetching character data.
+   */
   constructor(private characterService: CharacterService) {}
 
+  /**
+   * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
+   */
   ngOnInit(): void {
     this.getCharacters();
   }
-
+  /**
+   * Moves to the previous page of characters.
+   */
   previousPage(): void {
     this.currentPage--;
     this.getCharacters();
   }
-
+  /**
+   * Moves to the next page of characters.
+   */
   nextPage(): void {
     this.currentPage++;
     this.getCharacters();
   }
+
+   /**
+   * Fetches characters based on current pagination and search criteria.
+   */
   getCharacters() {
     this.characters = this.characterService.getCharacters({
       page: this.currentPage,
@@ -46,7 +63,5 @@ export class CharacterPageComponent {
       this.currentPage = r.page;
     });
   }
-  houses!: House[];
-  selectedCharacter!: Character;
-  characters!: Observable<SearchResult<Character>>;
+
 }

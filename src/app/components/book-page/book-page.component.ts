@@ -19,27 +19,44 @@ export class BookPageComponent {
   searchTerm: string = '';
   maxPages: number = 0;
 
+  characters!: Character[]; //An array containing characters fetched from the character service.
+  books!: Observable<SearchResult<Book>>; // An observable emitting search results of books.
+
+   /**
+   * Constructor of the `BookPageComponent` class.
+   * @param bookService - The service for fetching book data.
+   * @param characterService - The service for fetching character data.
+   */
   constructor(
     private bookService: BookService,
     private characterService: CharacterService
   ) {}
-
+  /**
+   * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
+   */
   ngOnInit(): void {
     this.getBooks();
     this.characterService
       .getCharacters()
       .subscribe((h) => (this.characters = h.results));
   }
-
+/**
+   * Moves to the previous page of books.
+   */
   previousPage(): void {
     this.currentPage--;
     this.getBooks();
   }
-
+ /**
+   * Moves to the next page of books.
+   */
   nextPage(): void {
     this.currentPage++;
     this.getBooks();
   }
+  /**
+   * Fetches books based on current pagination and search criteria.
+   */
   getBooks() {
     this.books = this.bookService.getBooks({
       page: this.currentPage,
@@ -47,18 +64,9 @@ export class BookPageComponent {
       searchTerm: this.searchTerm,
     });
     this.books.subscribe((r) => {
-      //console.log(r.results);
       this.maxPages = Math.ceil(r.allResults / this.pageSize);
       this.currentPage = r.page;
     });
   }
-  getHouseName(id: number) {
-    let house = _.find(this.characters || [], (c) => c.id == id);
 
-    return house && house.name;
-  }
-
-  characters!: Character[];
-  selectedBook!: Book;
-  books!: Observable<SearchResult<Book>>;
 }

@@ -9,27 +9,43 @@ import { HouseService } from '../../services/house.service';
 import { BookService } from '../../services/book.service';
 import { SearchService } from '../../services/search.service';
 
+
+/**
+ * Represents the component responsible for displaying search results for characters, houses, and books.
+ */
 @Component({
   selector: 'app-search-result',
   templateUrl: './search-result.component.html',
   styleUrls: ['./search-result.component.css'],
 })
 export class SearchResultsComponent implements OnInit {
-  characterSearchResult!: Observable<SearchResult<Character>>;
-  houseSearchResult!: Observable<SearchResult<House>>;
-  bookSearchResult!: Observable<SearchResult<Book>>;
+  characterSearchResult!: Observable<SearchResult<Character>>; // An observable emitting search results for characters.
+  houseSearchResult!: Observable<SearchResult<House>>; //An observable emitting search results for houses.
+  bookSearchResult!: Observable<SearchResult<Book>>; // An observable emitting search results for books.
 
+   /**
+   * Constructor of the `SearchResultsComponent` class.
+   * @param characterService - The service for fetching character data.
+   * @param houseService - The service for fetching house data.
+   * @param bookService - The service for fetching book data.
+   * @param searchService - The service for handling search functionality.
+   */
   constructor(
     private characterService: CharacterService,
     private houseService: HouseService,
     private bookService: BookService,
     private searchService: SearchService
   ) {}
-
+  /**
+   * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
+   */
   ngOnInit(): void {
     this.search(this.searchService.getSearchTerm());
   }
-
+ /**
+   * Performs a search using the provided search term.
+   * @param searchTerm - The term to search for.
+   */
   search(searchTerm: string) {
     this.characterSearchResult = this.characterService.getCharacters({
       searchTerm,
@@ -37,6 +53,11 @@ export class SearchResultsComponent implements OnInit {
     this.houseSearchResult = this.houseService.getHouses({ searchTerm });
     this.bookSearchResult = this.bookService.getBooks({ searchTerm });
   }
+  /**
+   * Handles pagination for search results based on the search type.
+   * @param event - The pagination event.
+   * @param searchType - The type of search (character, house, or book).
+   */
   pageChanged(event: any, searchType: string) {
     let page: number;
     const searchTerm = this.searchService.getSearchTerm();

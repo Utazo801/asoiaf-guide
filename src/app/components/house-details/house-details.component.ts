@@ -22,10 +22,18 @@ export class HouseDetailsComponent {
   currentPage: number = 0;
   maxPage: number = 0;
 
-  swornMemberIds: number[] = [];
-  pagedSwornMembersIds: number[] = [];
-  swornMemberNames: Observable<string>[] = [];
+  swornMemberIds: number[] = []; //An array to hold IDs of sworn members.
+  pagedSwornMembersIds: number[] = []; //An array to hold paginated IDs of sworn members.
+  swornMemberNames: Observable<string>[] = []; //An array to hold observable names of sworn members.
 
+
+  /**
+   * Constructor of the `HouseDetailsComponent` class.
+   * @param route - The activated route.
+   * @param router - The router service.
+   * @param characterService - The service for fetching character details.
+   * @param houseService - The service for fetching house details.
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -33,6 +41,10 @@ export class HouseDetailsComponent {
     private houseService: HouseService
   ) {}
 
+
+   /**
+   * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
+   */
   ngOnInit(): void {
     const houseid = this.route.snapshot.paramMap.get('id') ?? 'no';
     if (houseid === 'no') {
@@ -45,6 +57,11 @@ export class HouseDetailsComponent {
     this.maxPage = Math.ceil(this.swornMemberIds.length / this.pageSize) - 1;
     this.updatePagedSwornCharacter();
   }
+
+   /**
+   * Retrieves the details of the house with the given ID.
+   * @param id - The ID of the house.
+   */
   getHouse(id: number) {
     this.houseService.getHouseByID(id).subscribe(
       (house) => {
@@ -63,6 +80,9 @@ export class HouseDetailsComponent {
     );
   }
 
+ /**
+   * Parses the URLs of sworn members to extract their IDs.
+   */
   private ParseSwornCharacterURls() {
     if (this.house.swornMembers && this.house.swornMembers.length > 0) {
       let sworncharacterurls = this.house.swornMembers;
@@ -72,6 +92,11 @@ export class HouseDetailsComponent {
       });
     }
   }
+   /**
+   * Parses the URL of a cadet branch to extract its ID.
+   * @param url - The URL of the cadet branch.
+   * @returns The ID of the cadet branch.
+   */
   ParseCadetURls(url: string): number {
     let cadetid: number = 0;
     const urlsplit = url.split('/');
@@ -79,18 +104,34 @@ export class HouseDetailsComponent {
     return cadetid;
   }
 
+  /**
+   * Retrieves the name of the character with the given ID.
+   * @param id - The ID of the character.
+   * @returns An observable emitting the name of the character.
+   */
   getCharacterName(id: number): Observable<string> {
     return this.characterService.getCharacterName(id);
   }
-
+ /**
+   * Retrieves the name of the house with the given ID.
+   * @param id - The ID of the house.
+   * @returns An observable emitting the name of the house.
+   */
   getHouseName(id: number): Observable<string> {
     return this.houseService.getHouseName(id);
   }
-
+ /**
+   * Loads observable names of sworn members based on provided IDs.
+   * @param swornMemberIds - An array of sworn member IDs.
+   * @returns An array of observable sworn member names.
+   */
   private loadSwornMembers(swornMemberIds: number[]): Observable<string>[] {
     return swornMemberIds.map((id) => this.getCharacterName(id));
   }
-
+  /**
+   * Handles pagination for sworn members.
+   * @param event - The pagination event.
+   */
   pageSwornCharacters(event: any) {
     const startIndex = event.pageIndex * event.pageSize;
     const endIndex = startIndex + event.pageSize;
@@ -103,7 +144,9 @@ export class HouseDetailsComponent {
     this.currentPage = event.pageIndex;
     this.maxPage = Math.ceil(this.swornMemberIds.length / event.pageSize) - 1;
   }
-
+  /**
+   * Updates the array of paginated sworn member IDs based on current pagination settings.
+   */
   updatePagedSwornCharacter() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = Math.min(

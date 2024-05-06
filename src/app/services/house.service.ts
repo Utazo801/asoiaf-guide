@@ -2,12 +2,9 @@ import { Character } from '../models/character.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
-  EMPTY,
   Observable,
   catchError,
-  forkJoin,
   map,
-  merge,
   of,
   tap,
 } from 'rxjs';
@@ -15,17 +12,29 @@ import * as _ from 'lodash';
 import { SearchResult } from '../models/search-result.type';
 import { House } from '../models/house.type';
 
+/**
+ * Service responsible for fetching and managing house data.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class HouseService {
-  apiUrl = 'https://anapioficeandfire.com/api/houses';
-  private storageKey = 'houses';
-  private houses: House[] = [];
+  apiUrl = 'https://anapioficeandfire.com/api/houses'; //API URL for fetching house data.
+  private storageKey = 'houses'; //Key for storing houses in local storage.
+  private houses: House[] = []; //Array to hold cached house data.
+
+    /**
+   * Constructor of the `HouseService` class.
+   * @param http - The HTTP client for making requests.
+   */
   constructor(private http: HttpClient) {
     this.getHouses();
   }
-
+ /**
+   * Fetches houses based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting the search results of houses.
+   */
   getHouses(options?: {
     searchTerm?: string;
     page?: number;
@@ -86,7 +95,11 @@ export class HouseService {
       })
     );
   }
-
+/**
+   * Fetches houses from the API based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting an array of houses.
+   */
   private fetchHousesFromApi(options?: {
     page?: number;
     pageSize?: number;
@@ -124,7 +137,10 @@ export class HouseService {
       })
     );
   }
-
+ /**
+   * Processes house data received from the API.
+   * @param house - The house object to process.
+   */
   private HouseOperations(house: House) {
     const urlParts = house.url.split('/');
     house.id = parseInt(urlParts[urlParts.length - 1]);
@@ -145,6 +161,12 @@ export class HouseService {
       house.founderid = parseInt(founder[founder.length - 1]);
     }
   }
+
+   /**
+   * Fetches a single house from the API by ID.
+   * @param id - The ID of the house to fetch.
+   * @returns An observable emitting the fetched house or null if not found.
+   */
   fetchFromAPIByID(id: number): Observable<House | null> {
     return this.http.get<House>(`${this.apiUrl}/${id}`).pipe(
       map((house) => {
@@ -159,6 +181,11 @@ export class HouseService {
     );
   }
 
+ /**
+   * Retrieves a house by ID.
+   * @param id - The ID of the house to retrieve.
+   * @returns An observable emitting the house with the specified ID.
+   */
   getHouseByID(id: number): Observable<House | null> {
     const cachedData = localStorage.getItem(this.storageKey);
     if (cachedData) {
@@ -174,6 +201,11 @@ export class HouseService {
     return this.fetchFromAPIByID(id);
   }
 
+   /**
+   * Retrieves the name of a house by ID.
+   * @param id - The ID of the house.
+   * @returns An observable emitting the name of the house.
+   */
   getHouseName(id: number): Observable<string> {
     // Look for character in cache
     const existingData = localStorage.getItem(this.storageKey);
@@ -203,6 +235,10 @@ export class HouseService {
     }
   }
 
+  /**
+   * Saves an array of houses to local storage.
+   * @param houses - The array of houses to save.
+   */
   private saveArray(houses: House[]) {
     // Get existing data from localStorage
     const existingData = localStorage.getItem(this.storageKey);
@@ -226,6 +262,10 @@ export class HouseService {
     localStorage.setItem(this.storageKey, characterData);
   }
 
+  /**
+   * Saves a single house to local storage.
+   * @param house - The house to save.
+   */
   saveSingle(house: House) {
     let tempHouses: House[] = [];
     const cachedData = localStorage.getItem(this.storageKey);

@@ -6,17 +6,30 @@ import * as _ from 'lodash';
 import { SearchResult } from '../models/search-result.type';
 import { Book } from '../models/book.type';
 
+
+/**
+ * Service responsible for fetching and managing book data.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
-  apiUrl = 'https://anapioficeandfire.com/api/books';
-  private storageKey = 'books';
-  private books: Book[] = [];
+  apiUrl = 'https://anapioficeandfire.com/api/books'; //API URL for fetching book data.
+  private storageKey = 'books'; //Key for storing books in local storage.
+  private books: Book[] = []; //Array to hold cached book data.
+
+  /**
+   * Constructor of the `BookService` class.
+   * @param http - The HTTP client for making requests.
+   */
   constructor(private http: HttpClient) {
     this.getBooks();
   }
-
+/**
+   * Fetches books based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting the search results of books.
+   */
   getBooks(options?: {
     searchTerm?: string;
     page?: number;
@@ -73,6 +86,11 @@ export class BookService {
     );
   }
 
+ /**
+   * Fetches books from the API based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting an array of books.
+   */
   private fetchBooksFromApi(options?: {
     page?: number;
     pageSize?: number;
@@ -99,7 +117,10 @@ export class BookService {
       })
     );
   }
-
+/**
+   * Processes book data received from the API.
+   * @param book - The book object to process.
+   */
   private BookProcessing(book: Book) {
     const urlParts = book.url.split('/');
     book.id = parseInt(urlParts[urlParts.length - 1]);
@@ -114,7 +135,11 @@ export class BookService {
       book.povCharactersids.push(parseInt(urlpovParts[urlpovParts.length - 1]));
     });
   }
-
+ /**
+   * Fetches a single book from the API by ID.
+   * @param id - The ID of the book to fetch.
+   * @returns An observable emitting the fetched book or null if not found.
+   */
   fetchFromAPIByID(id: number): Observable<Book | null> {
     return this.http.get<Book>(`${this.apiUrl}/${id}`).pipe(
       map((book) => {
@@ -127,7 +152,11 @@ export class BookService {
       })
     );
   }
-
+  /**
+   * Retrieves a book by ID.
+   * @param id - The ID of the book to retrieve.
+   * @returns An observable emitting the book with the specified ID.
+   */
   getBookByID(id: number): Observable<Book | null> {
     const cachedData = localStorage.getItem(this.storageKey);
     if (cachedData) {
@@ -144,7 +173,11 @@ export class BookService {
       return this.fetchFromAPIByID(id);
     }
   }
-
+  /**
+   * Retrieves the name of a book by ID.
+   * @param id - The ID of the book.
+   * @returns An observable emitting the name of the book.
+   */
   getBookName(id: number): Observable<string> {
     // Look for character in cache
     const existingData = localStorage.getItem(this.storageKey);
@@ -173,8 +206,11 @@ export class BookService {
       );
     }
   }
+   /**
+   * Saves an array of books to local storage.
+   * @param books - The array of books to save.
+   */
   private saveArray(books: Book[]) {
-    console.log(books);
     // Get existing data from localStorage
     const existingData = localStorage.getItem(this.storageKey);
     let cachedBooks: Book[] = [];
@@ -196,7 +232,10 @@ export class BookService {
     const characterData = JSON.stringify(cachedBooks);
     localStorage.setItem(this.storageKey, characterData);
   }
-
+  /**
+   * Saves a single book to local storage.
+   * @param book - The book to save.
+   */
   saveSingle(book: Book) {
     let tempBooks: Book[] = [];
     const cachedData = localStorage.getItem(this.storageKey);

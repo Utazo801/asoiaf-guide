@@ -14,15 +14,15 @@ import { Observable } from 'rxjs';
   styleUrl: './book-details.component.css',
 })
 export class BookDetailsComponent {
-  id!: number;
-  book!: Book;
-  characters!: Character[];
+  id!: number;//The ID of the book whose details are being displayed.
+  book!: Book; //The book object containing details.
+  characters!: Character[]; //An array containing characters of the book.
 
-  currentPageOfNamedCharacters: number = 0;
-  currentPageOfPOVCharacters: number = 0;
+  currentPageOfNamedCharacters: number = 0; //The current page index of named characters being displayed.
+  currentPageOfPOVCharacters: number = 0; // The current page index of POV (Point of View) characters being displayed.
 
-  maxPageNamedCharacters: number = 0;
-  maxPagePovCharacters: number = 0;
+  maxPageNamedCharacters: number = 0; //The maximum page index for named characters.
+  maxPagePovCharacters: number = 0; //The maximum page index for POV characters.
 
   pageSizeNamedCharacters: number = 5; // Number of characters per page
   pageSizePOVCharacters: number = 5; // Number of POV characters per page
@@ -30,12 +30,20 @@ export class BookDetailsComponent {
   pagedNamedCharacterIds: number[] = []; // Array to hold paginated character ids
   pagedPOVCharacterIds: number[] = []; // Array to hold paginated POV character ids
 
-  NamedCharacterIds: number[] = [];
-  POVCharacterIds: number[] = [];
+  NamedCharacterIds: number[] = []; //An array to hold all named character IDs.
+  POVCharacterIds: number[] = []; //An array to hold all POV character IDs.
 
-  NamedCharacterNames: Observable<string>[] = [];
-  POVCharacterNames: Observable<string>[] = [];
+  NamedCharacterNames: Observable<string>[] = []; //An array to hold observable named character names.
+  POVCharacterNames: Observable<string>[] = []; //An array to hold observable POV character names.
 
+
+  /**
+   * Constructor of the `BookDetailsComponent` class.
+   * @param route - The activated route.
+   * @param router - The router service.
+   * @param bookService - The service for fetching book details.
+   * @param characterService - The service for fetching character details.
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -43,6 +51,9 @@ export class BookDetailsComponent {
     private characterService: CharacterService
   ) {}
 
+  /**
+   * Lifecycle hook called after Angular has initialized all data-bound properties of a directive.
+   */
   ngOnInit(): void {
     const bookId = this.route.snapshot.paramMap.get('id') ?? 'no';
     if (bookId === 'no') {
@@ -58,6 +69,10 @@ export class BookDetailsComponent {
       this.book.povCharactersids.length / this.pageSizePOVCharacters
     );
   }
+  /**
+   * Retrieves the details of the book with the given ID.
+   * @param id - The ID of the book.
+   */
   getBook(id: number) {
     this.bookService.getBookByID(id).subscribe(
       (book) => {
@@ -75,7 +90,11 @@ export class BookDetailsComponent {
       }
     );
   }
-  // Method to paginate POV characters
+
+  /**
+   * Handles pagination for POV characters.
+   * @param event - The pagination event.
+   */
   pagePOVCharacters(event: any) {
     const startIndex = event.pageIndex * event.pageSize;
     const endIndex = startIndex + event.pageSize;
@@ -96,7 +115,10 @@ export class BookDetailsComponent {
     this.maxPagePovCharacters =
       Math.ceil(this.POVCharacterIds.length / event.pageSize) - 1;
   }
-
+  /**
+   * Handles pagination for named characters.
+   * @param event - The pagination event.
+   */
   pageNamedCharacters(event: any) {
     const startIndex = event.pageIndex * event.pageSize;
     const endIndex = startIndex + event.pageSize;
@@ -117,26 +139,44 @@ export class BookDetailsComponent {
     this.maxPageNamedCharacters =
       Math.ceil(this.NamedCharacterIds.length / event.pageSize) - 1;
   }
-
+  /**
+   * Retrieves all characters from storage or from the api
+   */
   getCharacters() {
     this.characterService
       .getCharacters()
       .subscribe((r) => (this.characters = r.results));
   }
 
+  /**
+   * Retrieves the name of the character with the given ID.
+   * @param id - The ID of the character.
+   * @returns An observable emitting the name of the character.
+   */
   getCharacterName(id: number): Observable<string> {
     return this.characterService.getCharacterName(id);
   }
-
+  /**
+   * Loads observable named character names based on provided character IDs.
+   * @param characterIds - An array of character IDs.
+   * @returns An array of observable character names.
+   */
   private loadNamedCharacterArray(
     characterIds: number[]
   ): Observable<string>[] {
-    return this.NamedCharacterIds.map((id) => this.getCharacterName(id));
+    return this.NamedCharacterIds.map((characterIds) => this.getCharacterName(characterIds));
   }
+  /**
+   * Loads observable POV character names based on provided character IDs.
+   * @param characterIds - An array of character IDs.
+   * @returns An array of observable character names.
+   */
   private loadPovCharacterArray(characterIds: number[]): Observable<string>[] {
-    return this.POVCharacterIds.map((id) => this.getCharacterName(id));
+    return this.POVCharacterIds.map((characterIds) => this.getCharacterName(characterIds));
   }
-
+/**
+   * Updates the array of paginated POV character IDs based on current pagination settings.
+   */
   updatePagedPOVCharacterIds() {
     const startIndex =
       this.currentPageOfPOVCharacters * this.pageSizePOVCharacters;
@@ -155,6 +195,9 @@ export class BookDetailsComponent {
     );
     this.pagedPOVCharacterIds = currentPagePOVMemberIds;
   }
+  /**
+   * Updates the array of paginated named character IDs based on current pagination settings.
+   */
   updatePagedNamedCharacterIds() {
     const startIndex =
       this.currentPageOfNamedCharacters * this.pageSizeNamedCharacters;

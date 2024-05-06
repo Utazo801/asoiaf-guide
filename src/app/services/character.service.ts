@@ -2,30 +2,38 @@ import { Character } from '../models/character.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
-  EMPTY,
   Observable,
   catchError,
-  concatMap,
-  forkJoin,
   map,
-  merge,
   of,
   tap,
 } from 'rxjs';
 import * as _ from 'lodash';
 import { SearchResult } from '../models/search-result.type';
 
+/**
+ * Service responsible for fetching and managing character data.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class CharacterService {
-  apiUrl = 'https://anapioficeandfire.com/api/characters';
-  private storageKey = 'characters';
-  private characters: Character[] = [];
+  apiUrl = 'https://anapioficeandfire.com/api/characters'; //API URL for fetching character data.
+  private storageKey = 'characters'; //Key for storing characters in local storage.
+  private characters: Character[] = []; //Array to hold cached character data.
+
+  /**
+   * Constructor of the `CharacterService` class.
+   * @param http - The HTTP client for making requests.
+   */
   constructor(private http: HttpClient) {
     this.getCharacters();
   }
-
+  /**
+   * Fetches characters based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting the search results of characters.
+   */
   getCharacters(options?: {
     searchTerm?: string;
     page?: number;
@@ -84,7 +92,11 @@ export class CharacterService {
       })
     );
   }
-
+  /**
+   * Fetches characters from the API based on the provided options.
+   * @param options - Options for filtering and pagination.
+   * @returns An observable emitting an array of characters.
+   */
   private fetchCharactersFromApi(options?: {
     page?: number;
     pageSize?: number;
@@ -124,7 +136,11 @@ export class CharacterService {
         })
       );
   }
-
+ /**
+   * Fetches a single character from the API by ID.
+   * @param id - The ID of the character to fetch.
+   * @returns An observable emitting the fetched character or null if not found.
+   */
   fetchFromAPIByID(id: number): Observable<Character | null> {
     return this.http.get<Character>(`${this.apiUrl}/${id}`).pipe(
       map((character) => {
@@ -139,6 +155,10 @@ export class CharacterService {
     );
   }
 
+/**
+   * Processes character data received from the API.
+   * @param character - The character object to process.
+   */
   private CharacterProcessing(character: Character) {
     const urlParts = character.url.split('/');
     character.id = parseInt(urlParts[urlParts.length - 1]);
@@ -149,6 +169,11 @@ export class CharacterService {
     });
   }
 
+/**
+   * Retrieves a character by ID.
+   * @param id - The ID of the character to retrieve.
+   * @returns An observable emitting the character with the specified ID.
+   */
   getCharacterByID(id: number): Observable<Character | null> {
     const cachedData = localStorage.getItem(this.storageKey);
     if (cachedData) {
@@ -164,7 +189,11 @@ export class CharacterService {
       return this.fetchFromAPIByID(id);
     }
   }
-
+ /**
+   * Retrieves the name of a character by ID.
+   * @param id - The ID of the character.
+   * @returns An observable emitting the name of the character.
+   */
   getCharacterName(id: number): Observable<string> {
     // Look for character in cache
     const existingData = localStorage.getItem(this.storageKey);
@@ -197,7 +226,10 @@ export class CharacterService {
       );
     }
   }
-
+/**
+   * Saves an array of characters to local storage.
+   * @param characters - The array of characters to save.
+   */
   private saveArray(characters: Character[]) {
     // Get existing data from localStorage
     const existingData = localStorage.getItem(this.storageKey);
@@ -220,7 +252,10 @@ export class CharacterService {
     const characterData = JSON.stringify(cachedCharacters);
     localStorage.setItem(this.storageKey, characterData);
   }
-
+  /**
+   * Saves a single character to local storage.
+   * @param character - The character to save.
+   */
   saveSingle(character: Character) {
     let tempChars: Character[] = [];
     const cachedData = localStorage.getItem(this.storageKey);
